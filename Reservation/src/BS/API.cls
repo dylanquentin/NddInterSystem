@@ -12,6 +12,10 @@ XData UrlMap [ XMLNamespace = "http://www.intersystems.com/urlmap" ]
 <Route Url="/_spec" Method="GET" Call="SwaggerSpec" />
 <!-- Créer une voiture-->
 <Route Url="/voiture/" Method="POST" Call="CreerVoiture"/>
+
+<Route Url="/reserver/" Method="POST" Call="Reserver"/>
+<Route Url="/retirerParc/" Method="POST" Call="RetirerParc"/>
+
 </Routes>
 }
 
@@ -46,6 +50,38 @@ ClassMethod CreerVoiture() As %Status
 
     set tSC = ##class(Ens.Director).CreateBusinessService("ServiceVoiture",.tService) if $$$ISERR(tSC) quit 
     set tSC = tService.ProcessInput(msg,.response,"creerVoiture")
+    Set %response.Status = 200
+    Set %response.ContentType = ..#CONTENTTYPEJSON
+    Do response.%JSONExport()
+    Quit tSC
+}
+
+ClassMethod Reserver() As %Status
+{
+    #dim tSC As %Status = $$$OK
+    Set msg = ##class(msg.reserverDmde).%New()
+
+    Set data=%request.Content
+    $$$TOE(tSC,msg.%JSONImport(data))
+
+    set tSC = ##class(Ens.Director).CreateBusinessService("ServiceReservation",.tService) if $$$ISERR(tSC) quit 
+    set tSC = tService.ProcessInput(msg,.response,"reserver")
+    Set %response.Status = 200
+    Set %response.ContentType = ..#CONTENTTYPEJSON
+    Do response.%JSONExport()
+    Quit tSC
+}
+
+ClassMethod RetirerParc() As %Status
+{
+    #dim tSC As %Status = $$$OK
+    Set msg = ##class(msg.retirerParcDmde).%New()
+
+    Set data=%request.Content
+    $$$TOE(tSC,msg.%JSONImport(data))
+
+    set tSC = ##class(Ens.Director).CreateBusinessService("ServiceRetirerParc",.tService) if $$$ISERR(tSC) quit 
+    set tSC = tService.ProcessInput(msg,.response,"retirer")
     Set %response.Status = 200
     Set %response.ContentType = ..#CONTENTTYPEJSON
     Do response.%JSONExport()
